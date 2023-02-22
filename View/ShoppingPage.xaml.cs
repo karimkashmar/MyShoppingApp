@@ -12,4 +12,9 @@ public partial class ShoppingPage : ContentPage
         BindingContext = viewModel;
         _viewModel = viewModel;
     }
+
+    private void ContentPage_Loaded(object sender, EventArgs e)
+    {
+        await _viewModel.OnLoaded();
+    }
 }
