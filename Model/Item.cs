@@ -10,5 +10,6 @@
         public string LDescription { get; set; }
         public int QtyInStock { get; set; }
         public int TrendingRating { get; set; }
+        public int RequestedAmount { get; set; }
     }
 }

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:model="clr-namespace:MyShoppingApp.Model"
              x:Class="MyShoppingApp.View.ShoppingPage"
              Title="ShoppingPage"
              Loaded="ContentPage_Loaded">
-    <Grid BackgroundColor="White"
+    <Grid 
         ColumnDefinitions="*,*,*"
         ColumnSpacing="5"
-        RowDefinitions="*,*"
+        RowDefinitions="*,80,100"
         RowSpacing="2">
         <CollectionView
             Grid.ColumnSpan="3"
@@ -16,19 +17,25 @@
             SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Item">
-                    <Grid Padding="10" Background="Red">
+                    <Grid Padding="10" >
                         <Frame HeightRequest="125">
-                            <Grid Padding="0" ColumnDefinitions="125,*">
+                            <Grid Padding="0" ColumnDefinitions="80,*,Auto">
                                 <Image Aspect="AspectFill" Source="{Binding Image}"
-                                       WidthRequest="125"
-                                       HeightRequest="125"/>
+                                       WidthRequest="80"
+                                       HeightRequest="80"/>
                                 <VerticalStackLayout
                                     VerticalOptions="Center"
                                     Grid.Column="1"
                                     Padding="10">
-                                    <Label Text="{Binding Name}" />
-                                    <Label Text="{Binding Price}" />
-                                    <Label Text="{Binding QtyInStock}" />
+                                    <Label Text="{Binding Name, StringFormat='Item: {0}'}" HorizontalOptions="Start"  />
+                                    <Label Text="{Binding Price, StringFormat='Price: ${0:N0}'}" HorizontalOptions="Start"  />
+                                    <Label Text="{Binding QtyInStock, StringFormat='Remaining: {0}'}" HorizontalOptions="Start"  />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    VerticalOptions="Center"
+                                    Grid.Column="2"
+                                    Padding="10">
+                                    <Entry Text="{Binding RequestedAmount, Mode=TwoWay}" TextChanged="Entry_TextChanged"></Entry>
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
@@ -37,9 +44,21 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <Label Text="{Binding TotalAmount, StringFormat='Total: ${0:N0}', Mode=TwoWay}" 
+                HorizontalOptions="Center"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="20"
+                />
+        
         <Button Text="Place Order" 
                 Command="{Binding PlaceOrderCommand}"
-                Grid.Row="1"
-                Grid.Column="0"/>
+                HorizontalOptions="Center"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="20"
+                />
     </Grid>
 </ContentPage>

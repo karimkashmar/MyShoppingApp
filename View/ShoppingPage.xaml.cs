@@ -17,4 +17,9 @@ public partial class ShoppingPage : ContentPage
     {
         await _viewModel.OnLoaded();
     }
+
+    private async void Entry_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        await _viewModel.OnRequestedAmountChanged();
+    }
 }
