@@ -36,7 +36,7 @@ namespace MyShoppingApp.ViewModel
         public async Task Shop()
         {
             
-           // await Shell.Current.GoToAsync(nameof(DashboardPage), true);
+           await Shell.Current.GoToAsync(nameof(ShoppingPage), true);
 
         }
     }
