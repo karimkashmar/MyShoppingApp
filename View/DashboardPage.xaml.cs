@@ -1,9 +1,14 @@
+using MyShoppingApp.ViewModel;
+
 namespace MyShoppingApp.View;
 
 public partial class DashboardPage : ContentPage
 {
-	public DashboardPage()
-	{
-		InitializeComponent();
-	}
+    private DashboardViewModel _viewModel;
+    public DashboardPage(DashboardViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+        _viewModel = viewModel;
+    }
 }

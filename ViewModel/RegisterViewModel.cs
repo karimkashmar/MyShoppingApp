@@ -19,7 +19,7 @@ namespace MyShoppingApp.ViewModel
     {
         #region Properties
         [ObservableProperty]
-        User user;
+        User userObj;
 
         private DatabaseService _databaseService;
         #endregion
@@ -28,7 +28,7 @@ namespace MyShoppingApp.ViewModel
 
         public RegisterViewModel(DatabaseService databaseService)
         {
-            User = new User();
+            UserObj = new User();
             _databaseService = databaseService;
         }
         #endregion
@@ -39,16 +39,16 @@ namespace MyShoppingApp.ViewModel
         {
             try
             {
-                if (User == null)
+                if (UserObj == null)
                 {
                     await App.ShowAlert($"User is null!");
                     return;
                 }
-                if (string.IsNullOrEmpty(User.Username) ||
-                    string.IsNullOrEmpty(User.Email) ||
-                    string.IsNullOrEmpty(User.FName) ||
-                    string.IsNullOrEmpty(User.LName) ||
-                    string.IsNullOrEmpty(User.Password))
+                if (string.IsNullOrEmpty(UserObj.Username) ||
+                    string.IsNullOrEmpty(UserObj.Email) ||
+                    string.IsNullOrEmpty(UserObj.FName) ||
+                    string.IsNullOrEmpty(UserObj.LName) ||
+                    string.IsNullOrEmpty(UserObj.Password))
                 {
                     await App.ShowAlert($"Please make sure fields aren't empty!");
                     return;
@@ -56,13 +56,13 @@ namespace MyShoppingApp.ViewModel
 
                 // TODO: do validation on fields
 
-                var response = await _databaseService.AddUserAsync(User);
+                var response = await _databaseService.AddUserAsync(UserObj);
                 if (response > 0)
                 {
                     await App.ShowAlert($"Success! You can now login.");
 
-                    User = new User();
-                   // await Shell.Current.GoToAsync($"..", true);
+                    UserObj = new User();
+                    await Shell.Current.GoToAsync($"..", true);
                 }
                 else
                 {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MyShoppingApp.Services;
-
+using System.Text.Json;
 
 namespace MyShoppingApp.ViewModel
 {
@@ -44,7 +44,7 @@ namespace MyShoppingApp.ViewModel
 
                 // TODO: do validation on fields
 
-                var  foundUser = await _databaseService.ValidatePasswordAsync(Username, Password);
+                var foundUser = await _databaseService.ValidatePasswordAsync(Username, Password);
                 if (foundUser == null)
                 {
                     await App.ShowAlert($"Error: username or password invalid.");
@@ -52,7 +52,12 @@ namespace MyShoppingApp.ViewModel
                 }
                 else
                 {
-                    await Shell.Current.GoToAsync(nameof(DashboardPage), true);
+                    foundUser.Password = null;
+                    await Shell.Current.GoToAsync(nameof(DashboardPage), true, new Dictionary<string, object>
+                    {
+                        {"MyUser", foundUser }
+                    });
+                    // await Shell.Current.GoToAsync($"{nameof(DashboardPage)}?user={JsonSerializer.Serialize(foundUser)}", true);
                 }
             }
             catch (Exception ex)

@@ -4,9 +4,25 @@
              x:Class="MyShoppingApp.View.DashboardPage"
              Title="DashboardPage">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+
+
+        <Label Text="{Binding MyUser.FName, StringFormat='Hi, {0}!'}" HorizontalOptions="Center"  />
+        
+        <!--<Label
+            Text="{0}{Binding MyUser.FName}"
+            HorizontalOptions="Center" 
+            />-->
+
+
+        <Button
+             Text="Shop"
+             HorizontalOptions="Center" 
+             Command="{Binding ShopCommand}"
+                />
+        <Button
+                Text="My Orders"
+                HorizontalOptions="Center" 
+                Command="{Binding MyOrdersCommand}"
+                />
     </VerticalStackLayout>
 </ContentPage>
