@@ -5,18 +5,18 @@
              x:Class="MyShoppingApp.View.ShoppingPage"
              Title="ShoppingPage"
              Loaded="ContentPage_Loaded">
-    <Grid
-        ColumnDefinitions="50,*,50"
+    <Grid BackgroundColor="White"
+        ColumnDefinitions="*,*,*"
         ColumnSpacing="5"
-        RowDefinitions="*,Auto"
+        RowDefinitions="*,*"
         RowSpacing="2">
         <CollectionView
-            Grid.ColumnSpan="2"
-            ItemsSource="{Binding Items}"
+            Grid.ColumnSpan="3"
+            ItemsSource="{Binding Items, Mode=TwoWay}"
             SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Item">
-                    <Grid Padding="10">
+                    <Grid Padding="10" Background="Red">
                         <Frame HeightRequest="125">
                             <Grid Padding="0" ColumnDefinitions="125,*">
                                 <Image Aspect="AspectFill" Source="{Binding Image}"

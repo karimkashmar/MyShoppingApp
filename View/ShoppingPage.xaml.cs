@@ -13,7 +13,7 @@ public partial class ShoppingPage : ContentPage
         _viewModel = viewModel;
     }
 
-    private void ContentPage_Loaded(object sender, EventArgs e)
+    private async void ContentPage_Loaded(object sender, EventArgs e)
     {
         await _viewModel.OnLoaded();
     }

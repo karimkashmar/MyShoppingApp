@@ -1,4 +1,5 @@
-﻿using MyShoppingApp.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MyShoppingApp.Model;
 using MyShoppingApp.Services;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,18 @@ namespace MyShoppingApp.ViewModel
 
         public async Task OnLoaded()
         {
-            return;
+            var list = new List<Item>();
+            list = await _databaseService.GetItemsAsync();
+
+            if (list != null && list.Count > 0)
+            {
+                Items.Clear();
+            }
+
+            foreach (var item in list)
+            {
+                Items.Add(item);
+            }
         }
     }
 }
