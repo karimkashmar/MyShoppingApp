@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MyShoppingApp.ViewModel"
+             x:DataType="viewmodel:MainViewModel"
+             Title="{Binding Title}"
+             x:Class="MyShoppingApp.View.MainPage"
+             Loaded="ContentPage_Loaded">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+            <Button
+                Text="Login"
+                SemanticProperties.Hint="Click here if you already have an account"
+                HorizontalOptions="Center" 
+                Command="{Binding LoginCommand}"
+                />
+            <Button
+                Text="Register"
+                SemanticProperties.Hint="Click here if you don't have an account"
+                HorizontalOptions="Center" 
+                Command="{Binding RegisterCommand}"
+                />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

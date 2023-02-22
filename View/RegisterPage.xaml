@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MyShoppingApp.ViewModel"
+             x:DataType="viewmodel:RegisterViewModel"
+             x:Class="MyShoppingApp.View.RegisterPage"
+             Title="RegisterPage">
+
+
+
+
+    <StackLayout>
+        <Entry Text="{Binding User.Username, Mode=TwoWay}" Placeholder="Username"/>
+        <Entry Text="{Binding User.Email, Mode=TwoWay}" Placeholder="Email" Keyboard="Email" />
+        <Entry Text="{Binding User.Password, Mode=TwoWay}" Placeholder="Password" IsPassword="True" />
+        <Entry Text="{Binding User.FName, Mode=TwoWay}" Placeholder="First Name" />
+        <Entry Text="{Binding User.LName, Mode=TwoWay}" Placeholder="Last Name" />
+
+        <Button
+                Text="Submit"
+                HorizontalOptions="Center" 
+                Command="{Binding SubmitCommand}"
+                />
+    </StackLayout>
+
+</ContentPage>

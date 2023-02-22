@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:MyShoppingApp.ViewModel"
+             x:DataType="viewmodel:LoginViewModel"
+             x:Class="MyShoppingApp.View.LoginPage"
+             Title="LoginPage">
+    <StackLayout>
+        <Entry Text="{Binding User.Username, Mode=TwoWay}" Placeholder="Username"/>
+        <Entry Text="{Binding User.Password, Mode=TwoWay}" Placeholder="Password" IsPassword="True" />
+
+        <Button Text="Login" />
+    </StackLayout>
+</ContentPage>
