@@ -6,6 +6,14 @@
              x:Class="MyShoppingApp.View.ShoppingPage"
              Title="ShoppingPage"
              Loaded="ContentPage_Loaded">
+    <ContentPage.Resources>
+        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Red" />
+        </Style>
+        <Style x:Key="ValidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Green" />
+        </Style>
+    </ContentPage.Resources>
     <Grid 
         ColumnDefinitions="*,*,*"
         ColumnSpacing="5"
@@ -35,7 +43,16 @@
                                     VerticalOptions="Center"
                                     Grid.Column="2"
                                     Padding="10">
-                                    <Entry Text="{Binding RequestedAmount, Mode=TwoWay}" TextChanged="Entry_TextChanged"></Entry>
+                                    <Entry Text="{Binding RequestedAmount, Mode=TwoWay}" TextChanged="Entry_TextChanged" Keyboard="Numeric">
+                                        <Entry.Behaviors>
+                                            <toolkit:NumericValidationBehavior 
+                                                InvalidStyle="{StaticResource InvalidEntryStyle}"
+                                                ValidStyle="{StaticResource ValidEntryStyle}"
+                                                MinimumValue="0"
+                                                MaximumValue="{Binding QtyInStock}"
+                                                MaximumDecimalPlaces="0" />
+                                        </Entry.Behaviors>
+                                    </Entry>
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>

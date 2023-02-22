@@ -2,6 +2,7 @@
 using MyShoppingApp.ViewModel;
 using Microsoft.Extensions.Logging;
 using MyShoppingApp.Services;
+using CommunityToolkit.Maui;
 
 namespace MyShoppingApp;
 
@@ -12,6 +13,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
