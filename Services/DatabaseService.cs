@@ -151,7 +151,35 @@ namespace MyShoppingApp.Services
 
             return null;
         }
+        public async Task<User> ValidatePasswordAsync(string username, string password)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
 
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT * FROM Users WHERE Username = @username";
+            command.Parameters.AddWithValue("@username", username);
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                var foundUser = new User
+                {
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Password = reader.GetString(3),
+                    FName = reader.GetString(4),
+                    LName = reader.GetString(5)
+                };
+                if (foundUser.Password == password)
+                    return foundUser;
+                else
+                    return null;
+            }
+            return null;
+        }
         public async Task<int> AddUserAsync(User user)
         {
             using var connection = new SqliteConnection(_connectionString);
@@ -169,5 +197,6 @@ namespace MyShoppingApp.Services
             return await command.ExecuteNonQueryAsync();
         }
     }
+
 
 }

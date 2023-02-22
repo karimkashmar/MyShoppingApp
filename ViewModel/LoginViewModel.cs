@@ -14,9 +14,13 @@ namespace MyShoppingApp.ViewModel
 {
     public partial class LoginViewModel : BaseViewModel
     {
-        
+
         [ObservableProperty]
-        User user;
+        string username;
+
+        [ObservableProperty]
+        string password;
+
 
         private DatabaseService _databaseService;
 
@@ -25,21 +29,14 @@ namespace MyShoppingApp.ViewModel
 
             _databaseService = databaseService;
         }
-
+        [RelayCommand]
         public async Task Login()
         {
             try
             {
-                if (User == null)
-                {
-                    await App.ShowAlert($"User is null!");
-                    return;
-                }
-                if (string.IsNullOrEmpty(User.Username) ||
-                    string.IsNullOrEmpty(User.Email) ||
-                    string.IsNullOrEmpty(User.FName) ||
-                    string.IsNullOrEmpty(User.LName) ||
-                    string.IsNullOrEmpty(User.Password))
+
+                if (string.IsNullOrEmpty(Username) ||
+                    string.IsNullOrEmpty(Password))
                 {
                     await App.ShowAlert($"Please make sure fields aren't empty!");
                     return;
@@ -47,20 +44,16 @@ namespace MyShoppingApp.ViewModel
 
                 // TODO: do validation on fields
 
-                var response = await _databaseService.AddUserAsync(User);
-                if (response > 0)
+                var  foundUser = await _databaseService.ValidatePasswordAsync(Username, Password);
+                if (foundUser == null)
                 {
-                    await App.ShowAlert($"Success! You can now login.");
-
-                    User = new User();
-                    // await Shell.Current.GoToAsync($"..", true);
+                    await App.ShowAlert($"Error: username or password invalid.");
+                    return;
                 }
                 else
                 {
-                    await App.ShowAlert($"Error! please try again!");
+                    await Shell.Current.GoToAsync(nameof(DashboardPage), true);
                 }
-
-
             }
             catch (Exception ex)
             {
