@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MyShoppingApp.View.OrderDetailsPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:MyShoppingApp.Model"
+             Title="OrderDetailsPage" 
+             Loaded="ContentPage_Loaded">
+    <ContentPage.Resources>
+        <Style x:Key="InvalidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Red" />
+        </Style>
+        <Style x:Key="ValidEntryStyle" TargetType="Entry">
+            <Setter Property="TextColor" Value="Green" />
+        </Style>
+    </ContentPage.Resources>
+    <Grid 
+        ColumnDefinitions="*,*,*"
+        ColumnSpacing="5"
+        RowDefinitions="80,*,80,80,100"
+        RowSpacing="2">
+        <Picker Title="Select Client" WidthRequest="300"  ItemsSource="{Binding Clients, Mode=TwoWay}" ItemDisplayBinding="{Binding EmailAddress}" Grid.Row="0" Grid.ColumnSpan="3" HorizontalOptions="Center" SelectedItem="{Binding SelectedClient, Mode=TwoWay}"/>
+        <CollectionView
+            Grid.ColumnSpan="3"
+            Grid.Row="1"
+            ItemsSource="{Binding OrderItems, Mode=TwoWay}"
+            SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:OrderItem">
+                    <Grid Padding="10" >
+                        <Frame HeightRequest="125">
+                            <Grid Padding="0" ColumnDefinitions="80,*,Auto">
+                                <Image Aspect="AspectFit" Source="{Binding Item.Image}"
+                                       WidthRequest="80"
+                                       HeightRequest="80"/>
+                                <VerticalStackLayout
+                                    VerticalOptions="Center"
+                                    Grid.Column="1"
+                                    Padding="10">
+                                    <Label Text="{Binding Item.Name, StringFormat='Item: {0}'}" HorizontalOptions="Start"  />
+                                    <Label Text="{Binding Item.Price, StringFormat='Price: ${0:N0}'}" HorizontalOptions="Start"  />
+                                    <Label Text="{Binding Item.QtyInStock, StringFormat='Remaining: {0}'}" HorizontalOptions="Start"  />
+                                    <Label Text="{Binding OrderQty, StringFormat='Ordered Qty: {0}'}" HorizontalOptions="Start"  />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout
+                                    VerticalOptions="Center"
+                                    Grid.Column="2"
+                                    Padding="10">
+                                    <Label Text="Updated Amount Requested" HorizontalOptions="Start"  />
+                                    <Entry Text="{Binding UpdatedRequestedAmount, Mode=TwoWay}" TextChanged="Entry_TextChanged"  Keyboard="Numeric">
+                                        <Entry.Behaviors>
+                                            <toolkit:NumericValidationBehavior 
+                                                InvalidStyle="{StaticResource InvalidEntryStyle}"
+                                                ValidStyle="{StaticResource ValidEntryStyle}"
+                                                MinimumValue="0"
+                                                MaximumValue="{Binding Item.QtyInStock}"
+                                                MaximumDecimalPlaces="0" />
+                                        </Entry.Behaviors>
+                                    </Entry>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Label Text="{Binding TotalAmount, StringFormat='Total: ${0:N0}', Mode=TwoWay}" 
+                HorizontalOptions="Center"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="20"
+                />
+        <DatePicker Grid.Row="3" Grid.ColumnSpan="3" Format="dd-MMM-yyyy" Date="{Binding Date}" MinimumDate="{Binding MinDate, Mode=TwoWay}" MaximumDate="{Binding MaxDate, Mode=TwoWay}" HorizontalOptions="Center" WidthRequest="250"/>
+        
+        <Button Text="Save Order" 
+                Command="{Binding SaveOrderCommand}"
+                HorizontalOptions="Center"
+                Grid.Row="4"
+                Grid.Column="0"
+                Margin="20"
+                />
+        <Button Text="Delete Order" 
+                Command="{Binding DeleteOrderCommand}"
+                HorizontalOptions="Center"
+                Grid.Row="4"
+                Grid.Column="2"
+                Margin="20"
+                />
+    </Grid>
+</ContentPage>
