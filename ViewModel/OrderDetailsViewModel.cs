@@ -69,6 +69,22 @@ namespace MyShoppingApp.ViewModel
                 orderItem.UpdatedRequestedAmount = orderItem.OrderQty;
             }
 
+            var itemsFromDB = await _databaseService.GetItemsAsync();
+            foreach (var item in itemsFromDB)
+            {
+                if (!orderItemsList.Select(oi => oi.ItemID).Contains(item.ItemID))
+                {
+                    orderItemsList.Add(new OrderItem()
+                    {
+                        ItemID = item.ItemID,
+                        Item = item,
+                        OrderID = MyOrder.OrderID,
+                        OrderQty = 0,
+                        UpdatedRequestedAmount = 0
+                    });
+                }
+            }
+
             if (orderItemsList != null && orderItemsList.Count > 0)
             {
                 OrderItems.Clear();
@@ -92,6 +108,7 @@ namespace MyShoppingApp.ViewModel
             }
 
             TotalAmount = MyOrder.TotalCost;
+            Date = MyOrder.DateCreated;
 
             // Get the client object from the list used to populate the dropdown, not the client object coming with the order object
             // This will help populate the dropdown by default
@@ -134,22 +151,71 @@ namespace MyShoppingApp.ViewModel
             bool allUpdatedCorrectly = true;
             foreach (var orderItem in OrderItems)
             {
-                if (orderItem.UpdatedRequestedAmount == 0)
+                if (orderItem.OrderQty == 0 && orderItem.UpdatedRequestedAmount > 0)
                 {
-                    var response = await _databaseService.DeleteOrderItemAsync(orderItem.OrderItemID);
-                    if (!response)
+                    // If item was not previously ordered, create new OrderItem
+
+                    var isOrderItemRequestSuccess = await _databaseService.CreateOrderItemAsync(new OrderItem()
                     {
-                        allUpdatedCorrectly = false;
+                        ItemID = orderItem.ItemID,
+                        OrderID = MyOrder.OrderID,
+                        OrderQty = orderItem.UpdatedRequestedAmount
+                    });
+                    if (isOrderItemRequestSuccess)
+                    {
+                        orderItem.Item.QtyInStock -= orderItem.UpdatedRequestedAmount;
+                        var isItemUpdateRequestSuccess = await _databaseService.UpdateItemAsync(orderItem.Item);
+                        if (!isItemUpdateRequestSuccess)
+                        {
+                            await App.ShowAlert($"Failed to update item qty for {orderItem.Item.Name}");
+                            allUpdatedCorrectly = false;
+                        }
                     }
                 }
                 else
                 {
-                    orderItem.OrderQty = orderItem.UpdatedRequestedAmount;
-                    var response = await _databaseService.UpdateOrderItemAsync(orderItem);
-
-                    if (!response)
+                    if (orderItem.OrderQty != 0 && orderItem.UpdatedRequestedAmount == 0)
                     {
-                        allUpdatedCorrectly = false;
+                        // If item was already in order, and is updated to 0, remove it
+
+
+                        var response = await _databaseService.DeleteOrderItemAsync(orderItem.OrderItemID);
+                        if (!response)
+                        {
+                            allUpdatedCorrectly = false;
+                        }
+                        else
+                        {
+                            orderItem.Item.QtyInStock += orderItem.OrderQty;
+                            var isItemUpdateRequestSuccess = await _databaseService.UpdateItemAsync(orderItem.Item);
+                            if (!isItemUpdateRequestSuccess)
+                            {
+                                await App.ShowAlert($"Failed to update item qty for {orderItem.Item.Name}");
+                                allUpdatedCorrectly = false;
+                            }
+                        }
+                    }
+                    else if (orderItem.OrderQty != 0)
+                    {
+                        // If item was already in order, and is updated to > 0, update it
+                        var previousOrderQty = orderItem.OrderQty;
+                        orderItem.OrderQty = orderItem.UpdatedRequestedAmount;
+                        var response = await _databaseService.UpdateOrderItemAsync(orderItem);
+
+                        if (!response)
+                        {
+                            allUpdatedCorrectly = false;
+                        }
+                        else
+                        {
+                            orderItem.Item.QtyInStock += previousOrderQty - orderItem.UpdatedRequestedAmount;
+                            var isItemUpdateRequestSuccess = await _databaseService.UpdateItemAsync(orderItem.Item);
+                            if (!isItemUpdateRequestSuccess)
+                            {
+                                await App.ShowAlert($"Failed to update item qty for {orderItem.Item.Name}");
+                                allUpdatedCorrectly = false;
+                            }
+                        }
                     }
                 }
             }
@@ -158,6 +224,7 @@ namespace MyShoppingApp.ViewModel
             {
                 MyOrder.ClientID = SelectedClient.ClientID;
                 MyOrder.TotalCost = TotalAmount;
+                MyOrder.DateCreated = Date;
                 var response = await _databaseService.UpdateOrderAsync(MyOrder);
 
                 if (response)
