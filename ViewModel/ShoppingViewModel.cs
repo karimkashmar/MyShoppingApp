@@ -131,7 +131,10 @@ namespace MyShoppingApp.ViewModel
                 Items.Clear();
                 Clients.Clear();
                 SelectedClient = null;
-                await Shell.Current.GoToAsync($"..", true);
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
+                    {
+                        {"MyUser", MyUser }
+                    });
             }
         }
 
