@@ -5,11 +5,14 @@ using MyShoppingApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 
 namespace MyShoppingApp.ViewModel
 {
+    [QueryProperty("MyUser", "MyUser")]
+
     public partial class ShoppingViewModel : BaseViewModel
     {
         private DatabaseService _databaseService;
@@ -18,6 +21,8 @@ namespace MyShoppingApp.ViewModel
         public ObservableCollection<Client> Clients { get; set; }
 
 
+        [ObservableProperty]
+        User myUser;
         [ObservableProperty]
         double totalAmount;
 
@@ -40,21 +45,92 @@ namespace MyShoppingApp.ViewModel
             totalAmount = 0;
 
 
-            if (DateTime.Now.Hour < 12)
-                minDate = DateTime.Now;
-            else
-                minDate = DateTime.Now.AddDays(1);
-            maxDate = DateTime.Today.AddMonths(60);
+
         }
 
         [RelayCommand]
         public async Task PlaceOrder()
         {
-            int clientID = SelectedClient.ClientID;
+            bool isOrderItemsValid = true;
+            bool isItemRequested = false;
+            foreach (var item in Items)
+            {
+                if (item.RequestedAmount > 0)
+                {
+                    isItemRequested = true;
+                }
+                if (item.RequestedAmount > item.QtyInStock)
+                {
+                    isOrderItemsValid = false;
+                    await App.ShowAlert($"You requested {item.RequestedAmount} of {item.Name}, but we only have {item.QtyInStock} in stock.");
+                    return;
+                }
+            }
+            if (!isItemRequested)
+            {
+                await App.ShowAlert("Please select at least 1 item.");
+                return;
+            }
+
+            int orderId = await _databaseService.CreateOrderAsync(new Order()
+            {
+                ClientID = SelectedClient.ClientID,
+                DateCreated = Date,
+                TotalCost = TotalAmount,
+                UserID = MyUser.UserID
+            });
+            bool isOrderSuccessful = true;
+
+            if (orderId < 1)
+            {
+                await App.ShowAlert("Failed to add order, please try again.");
+                isOrderSuccessful = false;
+
+            }
+            else
+            {
+                foreach (var item in Items)
+                {
+                    if (item.RequestedAmount > 0)
+                    {
+                        var isOrderItemRequestSuccess = await _databaseService.CreateOrderItemAsync(new OrderItem()
+                        {
+                            ItemID = item.ItemID,
+                            OrderID = orderId,
+                            OrderQty = item.RequestedAmount
+                        });
+                        if (isOrderItemRequestSuccess)
+                        {
+                            item.QtyInStock -= item.RequestedAmount;
+                            var isItemUpdateRequestSuccess = await _databaseService.UpdateItemAsync(item);
+                            if (!isItemUpdateRequestSuccess)
+                            {
+                                await App.ShowAlert($"Failed to update item qty for {item.Name}");
+                                isOrderSuccessful = false;
+                            }
+                        }
+                        else { isOrderSuccessful = false; }
+                    }
+                }
+            }
+            if (isOrderSuccessful)
+            {
+                await App.ShowAlert($"Success! {SelectedClient.EmailAddress} will be contacted on {Date}");
+                Items.Clear();
+                Clients.Clear();
+                SelectedClient = null;
+                await Shell.Current.GoToAsync($"..", true);
+            }
         }
 
         public async Task OnLoaded()
         {
+            if (DateTime.Now.Hour < 12)
+                MinDate = DateTime.Now;
+            else
+                MinDate = DateTime.Now.AddDays(1);
+            MaxDate = DateTime.Today.AddMonths(60);
+
             var itemsList = new List<Item>();
             itemsList = await _databaseService.GetItemsAsync();
 
@@ -91,13 +167,6 @@ namespace MyShoppingApp.ViewModel
 
             foreach (var item in Items)
             {
-                if (item.RequestedAmount > item.QtyInStock)
-                {
-                    item.RequestedAmount = item.QtyInStock;
-
-                    OnPropertyChanged(nameof(Items));
-                }
-
                 cost += Convert.ToDouble(item.RequestedAmount) * item.Price;
             }
 

@@ -71,7 +71,7 @@
                 Grid.ColumnSpan="3"
                 Margin="20"
                 />
-        <DatePicker Grid.Row="3" Grid.ColumnSpan="3" Format="DD-MMM-YYYY" Date="{Binding Date}" MinimumDate="{Binding MinDate}" MaximumDate="{Binding MaxDate}" HorizontalOptions="Center" WidthRequest="250"/>
+        <DatePicker Grid.Row="3" Grid.ColumnSpan="3" Format="dd-MMM-yyyy" Date="{Binding Date}" MinimumDate="{Binding MinDate, Mode=TwoWay}" MaximumDate="{Binding MaxDate, Mode=TwoWay}" HorizontalOptions="Center" WidthRequest="250"/>
         <Button Text="Place Order" 
                 Command="{Binding PlaceOrderCommand}"
                 HorizontalOptions="Center"

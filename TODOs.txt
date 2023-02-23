@@ -4,3 +4,4 @@
 - Enhance UI
 - Implement validation for fields
 - Implement dependency injection using IoC
+- Change db property: DateCreated to DeliveryDate

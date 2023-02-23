@@ -14,7 +14,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace MyShoppingApp.ViewModel
 {
 
-    [QueryProperty("MyUser","MyUser")]
+    [QueryProperty("MyUser", "MyUser")]
     public partial class DashboardViewModel : BaseViewModel
     {
 
@@ -35,9 +35,11 @@ namespace MyShoppingApp.ViewModel
         [RelayCommand]
         public async Task Shop()
         {
-            
-           await Shell.Current.GoToAsync(nameof(ShoppingPage), true);
 
+            await Shell.Current.GoToAsync(nameof(ShoppingPage), true, new Dictionary<string, object>
+                    {
+                        {"MyUser", MyUser }
+                    });
         }
     }
 }
