@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using MyShoppingApp.Model;
+using ThreadNetwork;
 
 namespace MyShoppingApp.Services
 {
@@ -13,7 +14,7 @@ namespace MyShoppingApp.Services
 
         public DatabaseService()
         {
-            var databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "database.db");
+            var databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MyShoppingAppDB.db");
             _connectionString = $"Data Source={databasePath}";
         }
 
@@ -28,22 +29,24 @@ namespace MyShoppingApp.Services
                 using var command = connection.CreateCommand();
                 command.Transaction = transaction;
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS Items (
-                                        ID INTEGER PRIMARY KEY,
+                                        ItemID INTEGER PRIMARY KEY,
                                         Price REAL NOT NULL,
                                         Name TEXT NOT NULL,
                                         Image Text NOT NULL,
                                         SDescription TEXT NOT NULL,
                                         LDescription TEXT NOT NULL,
-                                        QtyInStock INTEGER NOT NULL,
-                                        TrendingRating INTEGER NOT NULL
+                                        QtyInStock INTEGER NOT NULL
                                     );
                                     CREATE TABLE IF NOT EXISTS Orders (
                                         OrderID INTEGER PRIMARY KEY,
                                         UserID INTEGER NOT NULL,
-                                        DeliveryAddress TEXT NOT NULL,
                                         TotalCost REAL NOT NULL,
-                                        FOREIGN KEY (UserID) REFERENCES Users(Id)
+                                        DateCreated DATETIME NOT NULL,
+                                        ClientID INTEGER NOT NULL,
+                                        FOREIGN KEY (UserID) REFERENCES Users(UserID),
+                                        FOREIGN KEY (ClientID) REFERENCES Clients(ClientID)
                                     );
+
                                     CREATE TABLE IF NOT EXISTS OrderItems (
                                         OrderItemID INTEGER NOT NULL,
                                         ItemID INTEGER NOT NULL,
@@ -51,16 +54,25 @@ namespace MyShoppingApp.Services
                                         OrderQty INTEGER NOT NULL,
                                         PRIMARY KEY (OrderItemID),
                                         FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
-                                        FOREIGN KEY (ItemID) REFERENCES Items(ID)
+                                        FOREIGN KEY (ItemID) REFERENCES Items(ItemID)
                                     );
                                     CREATE TABLE IF NOT EXISTS Users (
-                                        Id INTEGER PRIMARY KEY,
+                                        UserID INTEGER PRIMARY KEY,
                                         Username TEXT NOT NULL,
                                         Email TEXT NOT NULL,
                                         Password TEXT NOT NULL,
                                         FName TEXT NOT NULL,
                                         LName TEXT NOT NULL
+                                    );
+                                    CREATE TABLE IF NOT EXISTS Clients (
+                                        ClientID INTEGER PRIMARY KEY,
+                                        FName TEXT NOT NULL,
+                                        LName TEXT NOT NULL,
+                                        EmailAddress TEXT NOT NULL,
+                                        PhoneNumber TEXT NOT NULL,
+                                        DeliveryAddress TEXT NOT NULL
                                     );";
+
                 await command.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();
                 return true;
@@ -88,7 +100,7 @@ namespace MyShoppingApp.Services
             {
                 users.Add(new User
                 {
-                    Id = reader.GetInt32(0),
+                    UserID = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
@@ -105,7 +117,7 @@ namespace MyShoppingApp.Services
             await connection.OpenAsync();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT * FROM Users WHERE Id = @id";
+            command.CommandText = "SELECT * FROM Users WHERE UserID = @id";
             command.Parameters.AddWithValue("@id", id);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -114,7 +126,7 @@ namespace MyShoppingApp.Services
             {
                 return new User
                 {
-                    Id = reader.GetInt32(0),
+                    UserID = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
@@ -140,7 +152,7 @@ namespace MyShoppingApp.Services
             {
                 return new User
                 {
-                    Id = reader.GetInt32(0),
+                    UserID = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
@@ -176,15 +188,14 @@ namespace MyShoppingApp.Services
             connection.Open();
 
             using var command = connection.CreateCommand();
-            command.CommandText = @"INSERT INTO Items (Price, Name, Image, SDescription, LDescription, QtyInStock, TrendingRating)
-                                VALUES ($price, $name, $image, $sdescription, $ldescription, $qtyinstock, $trendingrating)";
+            command.CommandText = @"INSERT INTO Items (Price, Name, Image, SDescription, LDescription, QtyInStock)
+                                VALUES ($price, $name, $image, $sdescription, $ldescription, $qtyinstock)";
             command.Parameters.AddWithValue("$price", item.Price);
             command.Parameters.AddWithValue("$name", item.Name);
             command.Parameters.AddWithValue("$image", item.Image);
             command.Parameters.AddWithValue("$sdescription", item.SDescription);
             command.Parameters.AddWithValue("$ldescription", item.LDescription);
             command.Parameters.AddWithValue("$qtyinstock", item.QtyInStock);
-            command.Parameters.AddWithValue("$trendingrating", item.TrendingRating);
 
             int result = await command.ExecuteNonQueryAsync();
             return result == 1;
@@ -197,21 +208,20 @@ namespace MyShoppingApp.Services
             connection.Open();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT ID, Price, Name, Image, SDescription, LDescription, QtyInStock, TrendingRating FROM Items";
+            command.CommandText = "SELECT ItemID, Price, Name, Image, SDescription, LDescription, QtyInStock FROM Items";
 
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 var item = new Item
                 {
-                    ID = reader.GetInt32(0),
+                    ItemID = reader.GetInt32(0),
                     Price = reader.GetDouble(1),
                     Name = reader.GetString(2),
                     Image = reader.GetString(3),
                     SDescription = reader.GetString(4),
                     LDescription = reader.GetString(5),
-                    QtyInStock = reader.GetInt32(6),
-                    TrendingRating = reader.GetInt32(7)
+                    QtyInStock = reader.GetInt32(6)
                 };
 
                 items.Add(item);
@@ -225,7 +235,7 @@ namespace MyShoppingApp.Services
             connection.Open();
 
             using var command = connection.CreateCommand();
-            command.CommandText = "SELECT ID, Price, Name, Image, SDescription, LDescription, QtyInStock, TrendingRating FROM Items WHERE ID = $id";
+            command.CommandText = "SELECT ItemID, Price, Name, Image, SDescription, LDescription, QtyInStock FROM Items WHERE ItemID = $id";
             command.Parameters.AddWithValue("$id", id);
 
             using var reader = await command.ExecuteReaderAsync();
@@ -233,14 +243,13 @@ namespace MyShoppingApp.Services
             {
                 var item = new Item
                 {
-                    ID = reader.GetInt32(0),
+                    ItemID = reader.GetInt32(0),
                     Price = reader.GetDouble(1),
                     Name = reader.GetString(2),
                     Image = reader.GetString(3),
                     SDescription = reader.GetString(4),
                     LDescription = reader.GetString(5),
-                    QtyInStock = reader.GetInt32(6),
-                    TrendingRating = reader.GetInt32(7)
+                    QtyInStock = reader.GetInt32(6)
                 };
 
                 return item;
@@ -257,7 +266,7 @@ namespace MyShoppingApp.Services
                     connection.Open();
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "DELETE FROM Items WHERE ID = @id";
+                    command.CommandText = "DELETE FROM Items WHERE ItemID = @id";
                     command.Parameters.AddWithValue("@id", id);
 
                     var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -280,15 +289,14 @@ namespace MyShoppingApp.Services
                     connection.Open();
 
                     var command = connection.CreateCommand();
-                    command.CommandText = "UPDATE Items SET Price = @price, Name = @name, Image = @image, SDescription = @sdescription, LDescription = @ldescription, QtyInStock = @qtyinstock, TrendingRating = @trendingrating WHERE ID = @id";
-                    command.Parameters.AddWithValue("@id", item.ID);
+                    command.CommandText = "UPDATE Items SET Price = @price, Name = @name, Image = @image, SDescription = @sdescription, LDescription = @ldescription, QtyInStock = @qtyinstock WHERE ItemID = @id";
+                    command.Parameters.AddWithValue("@id", item.ItemID);
                     command.Parameters.AddWithValue("@price", item.Price);
                     command.Parameters.AddWithValue("@name", item.Name);
                     command.Parameters.AddWithValue("@image", item.Image);
                     command.Parameters.AddWithValue("@sdescription", item.SDescription);
                     command.Parameters.AddWithValue("@ldescription", item.LDescription);
                     command.Parameters.AddWithValue("@qtyinstock", item.QtyInStock);
-                    command.Parameters.AddWithValue("@trendingrating", item.TrendingRating);
 
                     var rowsAffected = await command.ExecuteNonQueryAsync();
 
@@ -313,19 +321,20 @@ namespace MyShoppingApp.Services
                 // insert order
                 var insertOrderCmd = connection.CreateCommand();
                 insertOrderCmd.CommandText = @"
-                INSERT INTO Orders (UserID, DeliveryAddress, TotalCost) 
-                VALUES ($UserID, $DeliveryAddress, $TotalCost);
+                INSERT INTO Orders (UserID, TotalCost, DateCreated, ClientID) 
+                VALUES ($UserID, $TotalCost, $DateCreated, $ClientID);
                 SELECT last_insert_rowid();
             ";
                 insertOrderCmd.Parameters.AddWithValue("$UserID", order.UserID);
-                insertOrderCmd.Parameters.AddWithValue("$DeliveryAddress", order.DeliveryAddress);
                 insertOrderCmd.Parameters.AddWithValue("$TotalCost", order.TotalCost);
+                insertOrderCmd.Parameters.AddWithValue("$DateCreated", order.DateCreated);
+                insertOrderCmd.Parameters.AddWithValue("$ClientID", order.ClientID);
                 int orderId = Convert.ToInt32(await insertOrderCmd.ExecuteScalarAsync());
 
                 return orderId;
             }
         }
-        public async Task<List<Order>> GetOrdersAsync()
+        public async Task<List<Order>> GetOrdersByUserIDAsync(int id)
         {
             var orders = new List<Order>();
 
@@ -334,7 +343,8 @@ namespace MyShoppingApp.Services
                 await connection.OpenAsync();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT OrderID, UserID, DeliveryAddress, TotalCost FROM Orders";
+                command.CommandText = "SELECT OrderID, UserID, TotalCost, DateCreated, ClientID FROM Orders WHERE UserID = $id";
+                command.Parameters.AddWithValue("$id", id);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -344,8 +354,9 @@ namespace MyShoppingApp.Services
                         {
                             OrderID = reader.GetInt32(0),
                             UserID = reader.GetInt32(1),
-                            DeliveryAddress = reader.GetString(2),
-                            TotalCost = reader.GetDouble(3)
+                            TotalCost = reader.GetDouble(2),
+                            DateCreated = reader.GetDateTime(3),
+                            ClientID = reader.GetInt32(4)
                         };
 
                         orders.Add(order);
@@ -362,7 +373,7 @@ namespace MyShoppingApp.Services
                 await connection.OpenAsync();
 
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT UserID, DeliveryAddress, TotalCost FROM Orders WHERE OrderID = @orderId";
+                command.CommandText = "SELECT UserID, TotalCost, DateCreated, ClientID FROM Orders WHERE OrderID = @orderId";
                 command.Parameters.AddWithValue("@orderId", orderId);
 
                 using (var reader = await command.ExecuteReaderAsync())
@@ -373,8 +384,9 @@ namespace MyShoppingApp.Services
                         {
                             OrderID = orderId,
                             UserID = reader.GetInt32(0),
-                            DeliveryAddress = reader.GetString(1),
-                            TotalCost = reader.GetDouble(2)
+                            TotalCost = reader.GetDouble(1),
+                            DateCreated = reader.GetDateTime(2),
+                            ClientID = reader.GetInt32(3)
                         };
 
                         return order;
@@ -398,11 +410,6 @@ namespace MyShoppingApp.Services
                 command.Parameters.AddWithValue("@OrderId", orderId);
                 var rowsAffected = await command.ExecuteNonQueryAsync();
 
-                if (rowsAffected >= 1)
-                {
-                    command.CommandText = "DELETE FROM OrderItems WHERE OrderID = @OrderId";
-                    await command.ExecuteNonQueryAsync();
-                }
 
                 await transaction.CommitAsync();
                 return rowsAffected >= 1;
@@ -413,7 +420,7 @@ namespace MyShoppingApp.Services
                 throw;
             }
         }
-        public async Task<bool> UpdateOrderAsync(Order order) 
+        public async Task<bool> UpdateOrderAsync(Order order)
         {
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
@@ -423,10 +430,8 @@ namespace MyShoppingApp.Services
             try
             {
                 var command = connection.CreateCommand();
-                command.CommandText = @"UPDATE Orders SET DeliveryAddress = @DeliveryAddress, TotalCost = @TotalCost 
-                                WHERE OrderID = @OrderId";
+                command.CommandText = @"UPDATE Orders SET TotalCost = @TotalCost WHERE OrderID = @OrderId";
                 command.Parameters.AddWithValue("@OrderId", order.OrderID);
-                command.Parameters.AddWithValue("@DeliveryAddress", order.DeliveryAddress);
                 command.Parameters.AddWithValue("@TotalCost", order.TotalCost);
                 var rowsAffected = await command.ExecuteNonQueryAsync();
 
@@ -473,7 +478,7 @@ namespace MyShoppingApp.Services
                 return false;
             }
         }
-        public async Task<List<OrderItem>> GetOrderItemsAsync(int orderId)
+        public async Task<List<OrderItem>> GetOrderItemsByOrderIDAsync(int orderId)
         {
             try
             {
@@ -498,10 +503,10 @@ namespace MyShoppingApp.Services
 
                     while (query.Read())
                     {
-                      
+
                         OrderItem orderItem = new OrderItem
                         {
-                            Id = query.GetInt32(0),
+                            OrderItemID = query.GetInt32(0),
                             ItemID = query.GetInt32(1),
                             OrderID = query.GetInt32(2),
                             OrderQty = query.GetInt32(3)
@@ -524,7 +529,7 @@ namespace MyShoppingApp.Services
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            var query = "DELETE FROM OrderItem WHERE ID = @OrderItemId";
+            var query = "DELETE FROM OrderItem WHERE OrderItemID = @OrderItemId";
             using var command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@OrderItemId", orderItemId);
 
@@ -535,7 +540,7 @@ namespace MyShoppingApp.Services
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            var query = "UPDATE OrderItem SET ItemID = @ItemId, OrderQty = @OrderQty WHERE ID = @OrderItemId";
+            var query = "UPDATE OrderItem SET ItemID = @ItemId, OrderQty = @OrderQty WHERE OrderItemID = @OrderItemId";
             using var command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@ItemId", orderItem.ItemID);
             command.Parameters.AddWithValue("@OrderQty", orderItem.OrderQty);
@@ -543,6 +548,72 @@ namespace MyShoppingApp.Services
 
             return await command.ExecuteNonQueryAsync() > 0;
         }
+        #endregion
+
+
+        #region Client Crud Operations
+        public async Task<Client> GetClientByID(int clientID)
+        {
+            Client client = null;
+
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqliteCommand command = new SqliteCommand($"SELECT * FROM Clients WHERE ClientID = {clientID}", connection);
+                SqliteDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    client = new Client
+                    {
+                        ClientID = reader.GetInt32(0),
+                        FName = reader.GetString(1),
+                        LName = reader.GetString(2),
+                        EmailAddress = reader.GetString(3),
+                        PhoneNumber = reader.GetString(4),
+                        DeliveryAddress = reader.GetString(5)
+                    };
+                }
+
+                reader.Close();
+            }
+
+            return client;
+        }
+
+        public async Task<List<Client>> GetClients()
+        {
+            List<Client> clients = new List<Client>();
+
+            using (SqliteConnection connection = new SqliteConnection(_connectionString))
+            {
+                connection.Open();
+
+                SqliteCommand command = new SqliteCommand("SELECT * FROM Clients", connection);
+                SqliteDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    Client client = new Client
+                    {
+                        ClientID = reader.GetInt32(0),
+                        FName = reader.GetString(1),
+                        LName = reader.GetString(2),
+                        EmailAddress = reader.GetString(3),
+                        PhoneNumber = reader.GetString(4),
+                        DeliveryAddress = reader.GetString(5)
+                    };
+
+                    clients.Add(client);
+                }
+
+                reader.Close();
+            }
+
+            return clients;
+        }
+
         #endregion
 
         #region Extra Functions
@@ -561,7 +632,7 @@ namespace MyShoppingApp.Services
             {
                 var foundUser = new User
                 {
-                    Id = reader.GetInt32(0),
+                    UserID = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     Email = reader.GetString(2),
                     Password = reader.GetString(3),
