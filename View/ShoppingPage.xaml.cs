@@ -12,6 +12,7 @@ public partial class ShoppingPage : ContentPage
         BindingContext = viewModel;
         _viewModel = viewModel;
     }
+    // binding viewmodel with page
 
     private async void ContentPage_Loaded(object sender, EventArgs e)
     {

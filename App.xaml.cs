@@ -11,7 +11,7 @@ public partial class App : Application
 
 	public static async Task ShowAlert(string message)
 	{
-		await Shell.Current.DisplayAlert("Alert", message, "OK");
+		await Shell.Current.DisplayAlert("Notification", message, "OK");
 	}
 
 }

@@ -5,6 +5,7 @@ namespace MyShoppingApp.View;
 public partial class MyOrdersPage : ContentPage
 {
     private MyOrdersViewModel _viewModel;
+    // binding viewmodel with page
 
     public MyOrdersPage(MyOrdersViewModel viewModel)
 	{
@@ -21,7 +22,7 @@ public partial class MyOrdersPage : ContentPage
 
     public async void ContentPage_NavigatedTo(object sender, NavigatedToEventArgs e)
     {
-        await _viewModel.OnLoaded();
+        await _viewModel.OnLoaded(); // to avoid duplicated tasks and making sure it executes on back navigation
 
     }
 }

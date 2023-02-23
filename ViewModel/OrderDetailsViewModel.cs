@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace MyShoppingApp.ViewModel
 {
+
+    // view model responsible for logic to display and allow modification of individual orders (edit/delete)
+
     [QueryProperty("MyOrder", "Order")]
     public partial class OrderDetailsViewModel : BaseViewModel
     {

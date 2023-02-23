@@ -13,7 +13,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MyShoppingApp.ViewModel
 {
-
+    // DashboardViewModel inherits BaseViewModel to consequently inherit ObservableObject
+    // DashboardViewModel is responsible for the logic in the page after login
+    // QueryProperty allows the previous page to pass and assign the User object (currently logged in user)
     [QueryProperty("MyUser", "MyUser")]
     public partial class DashboardViewModel : BaseViewModel
     {

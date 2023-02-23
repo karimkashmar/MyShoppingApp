@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using MyShoppingApp.Services;
 
 
-
-
-
 namespace MyShoppingApp.ViewModel
+
 {
+    // view model responsible to register new users 
+
     public partial class RegisterViewModel : BaseViewModel
     {
         #region Properties

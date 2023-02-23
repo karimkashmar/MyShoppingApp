@@ -29,6 +29,7 @@ namespace MyShoppingApp.ViewModel
 
         public async Task OnLoaded()
         {
+            // Initialize Database to make sure it exists, otherwise create new
             if(await _databaseService.InitializeDatabaseAsync())
             {
                 //await App.ShowAlert("Database Initialization Success!");

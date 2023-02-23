@@ -6,6 +6,7 @@ public partial class MainPage : ContentPage
 {
 
     private MainViewModel _viewModel;
+    // binding viewmodel with page
 
     public MainPage(MainViewModel viewModel)
     {

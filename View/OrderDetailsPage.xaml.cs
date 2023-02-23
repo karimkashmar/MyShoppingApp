@@ -5,6 +5,8 @@ namespace MyShoppingApp.View;
 public partial class OrderDetailsPage : ContentPage
 {
     private OrderDetailsViewModel _viewModel;
+    // binding viewmodel with page
+
     public OrderDetailsPage(OrderDetailsViewModel viewModel)
 	{
 		InitializeComponent();

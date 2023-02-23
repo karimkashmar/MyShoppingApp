@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 
 namespace MyShoppingApp.ViewModel
 {
+    
+    // view model responsible for logic to display user's orders
     [QueryProperty("MyUser", "MyUser")]
     public partial class MyOrdersViewModel : BaseViewModel
     {

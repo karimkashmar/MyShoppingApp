@@ -82,7 +82,8 @@ namespace MyShoppingApp.Services
                 return false;
             }
         }
-
+        
+        // CRUD DB operations for User model
         #region User Crud Operations
         public async Task<List<User>> GetUsersAsync()
         {
@@ -180,6 +181,8 @@ namespace MyShoppingApp.Services
         }
         #endregion
 
+
+        // CRUD DB operations for Item model
         #region Items Crud Operations
         public async Task<bool> CreateItemAsync(Item item)
         {
@@ -310,6 +313,8 @@ namespace MyShoppingApp.Services
         }
         #endregion
 
+
+        // CRUD DB operations for Order model
         #region Orders Crud Operations
         public async Task<int> CreateOrderAsync(Order order)
         {
@@ -434,7 +439,9 @@ namespace MyShoppingApp.Services
             return await command.ExecuteNonQueryAsync() > 0;
         }
         #endregion
-
+       
+        
+        // CRUD DB operations for OrderItem model
         #region OrderItems Crud Operations
         public async Task<bool> CreateOrderItemAsync(OrderItem orderItem)
         {
@@ -538,8 +545,9 @@ namespace MyShoppingApp.Services
             return await command.ExecuteNonQueryAsync() > 0;
         }
         #endregion
-
-
+        
+        
+        // CRUD DB operations for Client model
         #region Client Crud Operations
         public async Task<Client> GetClientByIDAsync(int clientID)
         {
@@ -605,6 +613,8 @@ namespace MyShoppingApp.Services
 
         #endregion
 
+
+        // Extra function to validate password
         #region Extra Functions
         public async Task<User> ValidatePasswordAsync(string username, string password)
         {

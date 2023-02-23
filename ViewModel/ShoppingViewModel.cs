@@ -11,6 +11,8 @@ using System.Text;
 
 namespace MyShoppingApp.ViewModel
 {
+
+    // view model responsible for handling creation of new orders
     [QueryProperty("MyUser", "MyUser")]
 
     public partial class ShoppingViewModel : BaseViewModel

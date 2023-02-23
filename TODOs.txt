@@ -7,3 +7,5 @@
 - Change db property: DateCreated to DeliveryDate
 - Handle application errors
 - Implement logger (log4net)
+- More comments
+- More debugging

@@ -12,6 +12,7 @@ using System.Text.Json;
 
 namespace MyShoppingApp.ViewModel
 {
+    // view model responsible to login existing users by validating passwords using db.ValidatePasswordAsync
     public partial class LoginViewModel : BaseViewModel
     {
 
