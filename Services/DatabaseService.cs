@@ -459,10 +459,10 @@ namespace MyShoppingApp.Services
                     insertCommand.Connection = db;
 
                     insertCommand.CommandText = @"
-                INSERT INTO OrderItem (ItemId, OrderID, OrderQty)
-                VALUES ($ItemId, $OrderID, $OrderQty)";
+                INSERT INTO OrderItems (ItemID, OrderID, OrderQty)
+                VALUES ($ItemID, $OrderID, $OrderQty)";
 
-                    insertCommand.Parameters.AddWithValue("$ItemId", orderItem.ItemID);
+                    insertCommand.Parameters.AddWithValue("$ItemID", orderItem.ItemID);
                     insertCommand.Parameters.AddWithValue("$OrderID", orderItem.OrderID);
                     insertCommand.Parameters.AddWithValue("$OrderQty", orderItem.OrderQty);
 
@@ -528,7 +528,7 @@ namespace MyShoppingApp.Services
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            var query = "DELETE FROM OrderItem WHERE OrderItemID = @OrderItemId";
+            var query = "DELETE FROM OrderItems WHERE OrderItemID = @OrderItemId";
             using var command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@OrderItemId", orderItemId);
 
@@ -539,7 +539,7 @@ namespace MyShoppingApp.Services
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            var query = "UPDATE OrderItem SET ItemID = @ItemId, OrderQty = @OrderQty WHERE OrderItemID = @OrderItemId";
+            var query = "UPDATE OrderItems SET ItemID = @ItemId, OrderQty = @OrderQty WHERE OrderItemID = @OrderItemId";
             using var command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@ItemId", orderItem.ItemID);
             command.Parameters.AddWithValue("@OrderQty", orderItem.OrderQty);

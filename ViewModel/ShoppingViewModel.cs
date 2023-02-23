@@ -44,7 +44,11 @@ namespace MyShoppingApp.ViewModel
             SelectedClient = new Client();
             totalAmount = 0;
 
-
+            if (DateTime.Now.Hour < 12)
+                MinDate = DateTime.Now;
+            else
+                MinDate = DateTime.Now.AddDays(1);
+            MaxDate = DateTime.Today.AddMonths(60);
 
         }
 
@@ -53,6 +57,14 @@ namespace MyShoppingApp.ViewModel
         {
             bool isOrderItemsValid = true;
             bool isItemRequested = false;
+
+            if (SelectedClient == null || SelectedClient.ClientID<1)
+            {
+                await App.ShowAlert("Please select a client from the drop down menu");
+                return;
+            }
+
+
             foreach (var item in Items)
             {
                 if (item.RequestedAmount > 0)
@@ -115,7 +127,7 @@ namespace MyShoppingApp.ViewModel
             }
             if (isOrderSuccessful)
             {
-                await App.ShowAlert($"Success! {SelectedClient.EmailAddress} will be contacted on {Date}");
+                await App.ShowAlert($"Success! {SelectedClient.EmailAddress} will be contacted on {Date.ToString("dd-MMM-yyyy")}");
                 Items.Clear();
                 Clients.Clear();
                 SelectedClient = null;

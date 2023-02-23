@@ -41,5 +41,7 @@ namespace MyShoppingApp.ViewModel
                         {"MyUser", MyUser }
                     });
         }
+
+
     }
 }
