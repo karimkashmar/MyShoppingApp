@@ -1,0 +1,6 @@
+﻿- Encrypt password
+- Add language
+- Add token to login
+- Enhance UI
+- Implement validation for fields
+- 
