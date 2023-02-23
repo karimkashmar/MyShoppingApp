@@ -27,6 +27,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<DashboardViewModel>();
         builder.Services.AddSingleton<ShoppingViewModel>();
         builder.Services.AddSingleton<MyOrdersViewModel>();
+        builder.Services.AddSingleton<OrderDetailsViewModel>();
 
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<RegisterPage>();
@@ -34,6 +35,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<DashboardPage>();
         builder.Services.AddSingleton<ShoppingPage>();
         builder.Services.AddSingleton<MyOrdersPage>();
+        builder.Services.AddSingleton<OrderDetailsPage>();
 
         builder.Services.AddSingleton<DatabaseService>();
 

@@ -41,6 +41,15 @@ namespace MyShoppingApp.ViewModel
                         {"MyUser", MyUser }
                     });
         }
+        [RelayCommand]
+        public async Task MyOrders()
+        {
+
+            await Shell.Current.GoToAsync(nameof(MyOrdersPage), true, new Dictionary<string, object>
+                    {
+                        {"MyUser", MyUser }
+                    });
+        }
 
 
     }

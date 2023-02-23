@@ -424,24 +424,14 @@ namespace MyShoppingApp.Services
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            var transaction = await connection.BeginTransactionAsync();
+            var query = "UPDATE Orders SET TotalCost = @TotalCost, DateCreated = @DateCreated, ClientID = @ClientID WHERE OrderID = @OrderId";
+            using var command = new SqliteCommand(query, connection);
+            command.Parameters.AddWithValue("@OrderId", order.OrderID);
+            command.Parameters.AddWithValue("@TotalCost", order.TotalCost);
+            command.Parameters.AddWithValue("@DateCreated", order.DateCreated);
+            command.Parameters.AddWithValue("@ClientID", order.ClientID);
 
-            try
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = @"UPDATE Orders SET TotalCost = @TotalCost WHERE OrderID = @OrderId";
-                command.Parameters.AddWithValue("@OrderId", order.OrderID);
-                command.Parameters.AddWithValue("@TotalCost", order.TotalCost);
-                var rowsAffected = await command.ExecuteNonQueryAsync();
-
-                await transaction.CommitAsync();
-                return rowsAffected >= 1;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            return await command.ExecuteNonQueryAsync() > 0;
         }
         #endregion
 
@@ -543,7 +533,7 @@ namespace MyShoppingApp.Services
             using var command = new SqliteCommand(query, connection);
             command.Parameters.AddWithValue("@ItemId", orderItem.ItemID);
             command.Parameters.AddWithValue("@OrderQty", orderItem.OrderQty);
-            command.Parameters.AddWithValue("@OrderId", orderItem.OrderID);
+            command.Parameters.AddWithValue("@OrderItemId", orderItem.OrderItemID);
 
             return await command.ExecuteNonQueryAsync() > 0;
         }

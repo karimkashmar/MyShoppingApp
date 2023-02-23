@@ -55,7 +55,6 @@ namespace MyShoppingApp.ViewModel
         [RelayCommand]
         public async Task PlaceOrder()
         {
-            bool isOrderItemsValid = true;
             bool isItemRequested = false;
 
             if (SelectedClient == null || SelectedClient.ClientID<1)
@@ -73,7 +72,6 @@ namespace MyShoppingApp.ViewModel
                 }
                 if (item.RequestedAmount > item.QtyInStock)
                 {
-                    isOrderItemsValid = false;
                     await App.ShowAlert($"You requested {item.RequestedAmount} of {item.Name}, but we only have {item.QtyInStock} in stock.");
                     return;
                 }
