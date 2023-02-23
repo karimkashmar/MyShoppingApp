@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using MyShoppingApp.Model;
-using ThreadNetwork;
 
 namespace MyShoppingApp.Services
 {
@@ -552,7 +551,7 @@ namespace MyShoppingApp.Services
 
 
         #region Client Crud Operations
-        public async Task<Client> GetClientByID(int clientID)
+        public async Task<Client> GetClientByIDAsync(int clientID)
         {
             Client client = null;
 
@@ -582,7 +581,7 @@ namespace MyShoppingApp.Services
             return client;
         }
 
-        public async Task<List<Client>> GetClients()
+        public async Task<List<Client>> GetClientsAsync()
         {
             List<Client> clients = new List<Client>();
 

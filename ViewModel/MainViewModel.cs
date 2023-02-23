@@ -31,7 +31,7 @@ namespace MyShoppingApp.ViewModel
         {
             if(await _databaseService.InitializeDatabaseAsync())
             {
-                await App.ShowAlert("Database Initialization Success!");
+                //await App.ShowAlert("Database Initialization Success!");
 
             }
             else

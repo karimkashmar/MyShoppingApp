@@ -17,10 +17,12 @@
     <Grid 
         ColumnDefinitions="*,*,*"
         ColumnSpacing="5"
-        RowDefinitions="*,80,100"
+        RowDefinitions="80,*,80,80,100"
         RowSpacing="2">
+        <Picker Title="Select Client" WidthRequest="300"  ItemsSource="{Binding Clients, Mode=TwoWay}" ItemDisplayBinding="{Binding EmailAddress}" Grid.Row="0" Grid.ColumnSpan="3" HorizontalOptions="Center" SelectedItem="{Binding SelectedClient}"/>
         <CollectionView
             Grid.ColumnSpan="3"
+            Grid.Row="1"
             ItemsSource="{Binding Items, Mode=TwoWay}"
             SelectionMode="None">
             <CollectionView.ItemTemplate>
@@ -28,7 +30,7 @@
                     <Grid Padding="10" >
                         <Frame HeightRequest="125">
                             <Grid Padding="0" ColumnDefinitions="80,*,Auto">
-                                <Image Aspect="AspectFill" Source="{Binding Image}"
+                                <Image Aspect="AspectFit" Source="{Binding Image}"
                                        WidthRequest="80"
                                        HeightRequest="80"/>
                                 <VerticalStackLayout
@@ -43,6 +45,7 @@
                                     VerticalOptions="Center"
                                     Grid.Column="2"
                                     Padding="10">
+                                    <Label Text="Amount Requested" HorizontalOptions="Start"  />
                                     <Entry Text="{Binding RequestedAmount, Mode=TwoWay}" TextChanged="Entry_TextChanged" Keyboard="Numeric">
                                         <Entry.Behaviors>
                                             <toolkit:NumericValidationBehavior 
@@ -63,16 +66,16 @@
 
         <Label Text="{Binding TotalAmount, StringFormat='Total: ${0:N0}', Mode=TwoWay}" 
                 HorizontalOptions="Center"
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="20"
                 />
-        
+        <DatePicker Grid.Row="3" Grid.ColumnSpan="3" Format="DD-MMM-YYYY" Date="{Binding Date}" MinimumDate="{Binding MinDate}" MaximumDate="{Binding MaxDate}" HorizontalOptions="Center" WidthRequest="250"/>
         <Button Text="Place Order" 
                 Command="{Binding PlaceOrderCommand}"
                 HorizontalOptions="Center"
-                Grid.Row="2"
+                Grid.Row="4"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 Margin="20"
