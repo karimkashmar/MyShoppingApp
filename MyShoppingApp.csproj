@@ -64,10 +64,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiAsset Remove="Resources\Raw\LanguageResource.fr.resx" />
+	  <MauiAsset Remove="Resources\Raw\LanguageResource.resx" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="4.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\Raw\LanguageResource.fr.resx" />
+	  <Resource Include="Resources\Raw\LanguageResource.resx">
+	    <Generator>PublicResXFileCodeGenerator</Generator>
+	    <LastGenOutput>LanguageResource.Designer.cs</LastGenOutput>
+	  </Resource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -77,6 +91,14 @@
 	  <Compile Update="View\RegisterPage.xaml.cs">
 	    <DependentUpon>RegisterPage.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiAsset Update="Resources\Raw\LanguageResource.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>LanguageResource.resx</DependentUpon>
+	  </MauiAsset>
 	</ItemGroup>
 
 	<ItemGroup>

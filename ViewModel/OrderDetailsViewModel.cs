@@ -256,11 +256,14 @@ namespace MyShoppingApp.ViewModel
                 bool allDeletedSuccessfully = true;
                 foreach (var orderItem in OrderItems)
                 {
-                    var response = await _databaseService.DeleteOrderItemAsync(orderItem.OrderItemID);
-
-                    if (!response)
+                    if (orderItem.OrderQty > 0)
                     {
-                        allDeletedSuccessfully = false;
+                        var response = await _databaseService.DeleteOrderItemAsync(orderItem.OrderItemID);
+
+                        if (!response)
+                        {
+                            allDeletedSuccessfully = false;
+                        } 
                     }
                 }
 

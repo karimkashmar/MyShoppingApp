@@ -49,7 +49,7 @@ namespace MyShoppingApp.ViewModel
                 userOrder.Client = client;
             }
 
-            if (userOrdersList != null && userOrdersList.Count > 0)
+            if (userOrdersList != null && UserOrders.Count > 0)
             {
                 UserOrders.Clear();
             }
